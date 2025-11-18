@@ -76,7 +76,7 @@ class NationalIdValidator:
         if reminder != control_digit:
             raise ValidationError(self.message_invalid, params={'value': value})
 
-
+@deconstructible
 class UsernameValidator:
     """
         Dispatcher validator that selects the appropriate validation logic
