@@ -141,5 +141,3 @@ class UsernameValidatorTest(TestCase):
         code_5 = "123456"
         with self.assertRaises(ValidationError):
             self.validator(code_5)
-
-        code_6 = "111111111"
