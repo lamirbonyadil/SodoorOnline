@@ -29,9 +29,9 @@ __pycache__/
 *.pyc
 
 # Django Specific
-*.log               # Logs
-local_settings.py   # Local settings file
-htmlcov/            # Python coverage reports
+*.log
+local_settings.py
+htmlcov/
 .coverage
 .coverage.*
 .cache
