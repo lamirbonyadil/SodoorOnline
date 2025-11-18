@@ -4,20 +4,6 @@ from .validators import phone_number_validator, username_validator
 from .utils import default_file_path, get_image_file_path
 
 class CustomUserManager(BaseUserManager):
-    @classmethod
-    def normalize_phone_number(cls, phone_number):
-        """
-        Normalize the phone number by prefixing it with +98.
-        """
-        phone_number = phone_number or ""
-        try:
-            _, number = phone_number.split("0", 1)
-        except ValueError:
-            pass
-        else:
-            phone_number = "+98" + number
-        return phone_number
-
     def create_user(self, username, first_name, last_name, email, phone_number, password=None, **extra_fields):
         if not username:
             raise ValueError("Users must have a username.")
@@ -39,7 +25,7 @@ class CustomUserManager(BaseUserManager):
             first_name=first_name,
             last_name=last_name,
             email=self.normalize_email(email),
-            phone_number=self.normalize_phone_number(phone_number),
+            phone_number=phone_number,
             **extra_fields
         )
         user.set_password(password)
