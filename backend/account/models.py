@@ -59,6 +59,9 @@ class CustomUser(AbstractUser):
     USERNAME_FIELD  = 'username'
     REQUIRED_FIELDS = ['email', 'first_name', 'last_name', 'phone_number']
 
+    def __str__(self):
+        return self.get_full_name()
+
 
 class Institute(models.Model):
     user            = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
