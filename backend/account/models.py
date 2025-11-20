@@ -60,7 +60,7 @@ class CustomUser(AbstractUser):
     REQUIRED_FIELDS = ['email', 'first_name', 'last_name', 'phone_number']
 
     def __str__(self):
-        return self.get_full_name()
+        return self.username
 
 
 class Institute(models.Model):
