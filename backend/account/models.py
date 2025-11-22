@@ -2,6 +2,9 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser, BaseUserManager
 from .validators import phone_number_validator, username_validator
 from .utils import default_file_path, get_image_file_path
+from django.core.exceptions import ValidationError
+from django.utils.translation import gettext_lazy as _
+
 
 class CustomUserManager(BaseUserManager):
     def create_user(self, username, first_name, last_name, email, phone_number, password=None, **extra_fields):
@@ -33,7 +36,7 @@ class CustomUserManager(BaseUserManager):
 
         return user
 
-    def create_superuser(self, username, first_name, last_name, email, phone_number, password, **extra_fields):
+    def create_superuser(self, username, first_name, last_name, email, phone_number, password=None, **extra_fields):
         extra_fields.setdefault("is_staff", True)
         extra_fields.setdefault("is_superuser", True)
 
@@ -75,6 +78,13 @@ class Institute(models.Model):
     def __str__(self):
         return self.institute_name
 
+    def clean(self):
+        if self.user.role != CustomUser.Roles.INSTITUTE:
+            raise ValidationError(
+                _("Can't assign Institute profile to user with role '%(role)s'."),
+                params={'role': self.user.get_role_display()}
+            )
+
 class Student(models.Model):
     user            = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
     birth_date      = models.DateField(null=True, help_text="The date must be in the YYYY-MM-DD format.")
@@ -85,3 +95,10 @@ class Student(models.Model):
 
     def __str__(self):
         return self.user.get_full_name()
+
+    def clean(self):
+        if self.user.role != CustomUser.Roles.STUDENT:
+            raise ValidationError(
+                _("Can't assign Student profile to user with role '%(role)s'."),
+                params={'role': self.user.get_role_display()}
+            )
