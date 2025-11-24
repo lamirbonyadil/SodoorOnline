@@ -1,6 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser, BaseUserManager
-from .validators import phone_number_validator, username_validator
+from .validators import phone_number_validator, username_validator, image_file_extension_validator
 from .utils import default_file_path, get_image_file_path
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
@@ -71,7 +71,7 @@ class Institute(models.Model):
     institute_name  = models.CharField(max_length=100)
     description     = models.TextField(blank=True)
     website         = models.URLField(null=True, unique=True)
-    logo            = models.ImageField(upload_to=get_image_file_path, default=default_file_path, blank=True)
+    logo            = models.ImageField(upload_to=get_image_file_path, default=default_file_path, blank=True, validators=[image_file_extension_validator])
     created_at      = models.DateTimeField(auto_now_add=True)
     updated_at      = models.DateTimeField(auto_now=True)
 
@@ -89,7 +89,7 @@ class Student(models.Model):
     user            = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
     birth_date      = models.DateField(null=True, help_text="The date must be in the YYYY-MM-DD format.")
     bio             = models.TextField(blank=True)
-    avatar          = models.ImageField(upload_to=get_image_file_path, default=default_file_path, blank=True)
+    avatar          = models.ImageField(upload_to=get_image_file_path, default=default_file_path, blank=True, validators=[image_file_extension_validator])
     created_at      = models.DateTimeField(auto_now_add=True)
     updated_at      = models.DateTimeField(auto_now=True)
 
