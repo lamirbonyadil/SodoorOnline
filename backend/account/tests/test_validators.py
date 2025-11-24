@@ -1,6 +1,12 @@
 from django.test import TestCase
-from account.validators import PhoneNumberValidator, NationalCodeValidator, NationalIdValidator, UsernameValidator
+from account.validators import (PhoneNumberValidator,
+                                NationalCodeValidator,
+                                NationalIdValidator,
+                                UsernameValidator,
+                                image_file_extension_validator)
 from django.core.exceptions import ValidationError
+from django.core.files.uploadedfile import SimpleUploadedFile
+
 
 class PhoneNumberValidatorTest(TestCase):
     def setUp(self):
@@ -141,3 +147,34 @@ class UsernameValidatorTest(TestCase):
         code_5 = "123456"
         with self.assertRaises(ValidationError):
             self.validator(code_5)
+
+
+class ImageExtensionTest(TestCase):
+    def setUp(self):
+        self.validator = image_file_extension_validator
+
+    def test_jpg_file_extension(self):
+        img = self._create_temp_img(ext=".jpg")
+        self.validator(img)
+
+    def test_jpeg_file_extension(self):
+        img = self._create_temp_img(ext=".jpeg")
+        self.validator(img)
+
+    def test_png_file_extension(self):
+        img = self._create_temp_img(ext=".png")
+        self.validator(img)
+
+    def test_gif_image_extensions(self):
+        gif = self._create_temp_img(ext=".gif")
+        with self.assertRaises(ValidationError):
+            self.validator(gif)
+
+    def test_avif_img_extension(self):
+        avif = self._create_temp_img(ext=".avif")
+        with self.assertRaises(ValidationError):
+            self.validator(avif)
+
+
+    def _create_temp_img(self, ext: str):
+        return SimpleUploadedFile(name=f"test{ext}", content=b"", content_type=f"image/{ext[1:]}")
