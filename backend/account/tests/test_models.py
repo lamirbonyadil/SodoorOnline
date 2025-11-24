@@ -173,10 +173,9 @@ class InstituteProfileTest(TestCase):
         shutil.rmtree(MEDIA_ROOT, ignore_errors=True)
 
     def test_institute_profile_img(self):
-        sample_img = (b'\x47\x49\x46\x38\x39\x61\x01\x00\x01\x00\x80\x00\x00\x05\x04\x04\x00'
-                      b'\x00\x00\x2c\x00\x00\x00\x00\x01\x00\x01\x00\x00\x02\x02\x44\x01\x00\x3b')
-        file_name = "sample.gif"
-        uploaded_file = SimpleUploadedFile(file_name, sample_img, content_type="image/gif")
+        sample_img_content = b'\xff\xd8\xff\x00\x00\x00\x00\x00\x00\xff\xd9'
+        file_name = "sample.jpg"
+        uploaded_file = SimpleUploadedFile(file_name, sample_img_content, content_type="image/jpeg")
 
         self.institute_profile.logo = uploaded_file
         self.institute_profile.save()
@@ -238,13 +237,13 @@ class StudentProfileTest(TestCase):
         self.assertEqual(self.student_profile.birth_date, "1990-01-01")
 
     def tearDown(self):
+        # Clean up the temp directory
         shutil.rmtree(MEDIA_ROOT, ignore_errors=True)
 
     def test_student_profile_img(self):
-        sample_img = (b'\x47\x49\x46\x38\x39\x61\x01\x00\x01\x00\x80\x00\x00\x05\x04\x04\x00'
-                      b'\x00\x00\x2c\x00\x00\x00\x00\x01\x00\x01\x00\x00\x02\x02\x44\x01\x00\x3b')
-        file_name = "sample.gif"
-        uploaded_file = SimpleUploadedFile(file_name, sample_img, content_type="image/gif")
+        sample_img_content = b'\xff\xd8\xff\x00\x00\x00\x00\x00\x00\xff\xd9'
+        file_name = "sample.jpg"
+        uploaded_file = SimpleUploadedFile(file_name, sample_img_content, content_type="image/jpeg")
 
         self.student_profile.avatar = uploaded_file
         self.student_profile.save()
