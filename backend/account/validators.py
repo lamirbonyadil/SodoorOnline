@@ -76,6 +76,7 @@ class NationalIdValidator:
         if reminder != control_digit:
             raise ValidationError(self.message_invalid, params={'value': value})
 
+
 @deconstructible
 class UsernameValidator:
     """
@@ -100,3 +101,4 @@ class UsernameValidator:
 
 phone_number_validator = PhoneNumberValidator()
 username_validator = UsernameValidator()
+image_file_extension_validator = validators.FileExtensionValidator(allowed_extensions=["jpg", "jpeg", "png"])
