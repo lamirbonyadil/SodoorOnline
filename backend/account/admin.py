@@ -6,6 +6,25 @@ from django.http import HttpResponseRedirect
 from django.urls import reverse
 
 
+class StudentProfileInline(admin.StackedInline):
+    """
+    Enables editing Student profile info directly inside the CustomUser admin page.
+    """
+    model = Student
+    max_num = 1
+    can_delete = False
+    verbose_name_plural = 'Student Profile'
+
+class InstituteProfileInline(admin.StackedInline):
+    """
+    Enables editing Institute profile info directly inside the CustomUser admin page.
+    """
+    model = Institute
+    max_num = 1
+    can_delete = False
+    verbose_name = 'Institute Profile'
+
+
 @admin.register(CustomUser)
 class CustomUserAdmin(UserAdmin):
     form = CustomUserChangeForm
@@ -15,6 +34,7 @@ class CustomUserAdmin(UserAdmin):
     list_display = ['id', 'username', 'first_name', 'last_name', 'email', 'role', 'phone_number', 'province', 'city']
     list_filter = ['role', 'province', 'city']
     search_fields = ['username', 'first_name', 'last_name']
+
     sortable_by = []
     ordering = ['id']
     date_hierarchy = 'date_joined'
@@ -57,6 +77,27 @@ class CustomUserAdmin(UserAdmin):
         ),
     )
 
+    inlines = ()
+
+    def get_inline_instances(self, request, obj=None):
+        """
+        Override: Dynamically display inlines based on the user's role.
+        """
+        # If 'obj' is None, it means we are in the "Add User" view.
+        # We return an empty list because the user instance doesn't exist yet,
+        # so we can't link a profile to it or know which role will be selected.
+        if not obj:
+            return []
+
+        # Check the user's role to determine which profile inline to show.
+        inline_instances = []
+        if obj.role == "S":
+            inline_instances.append(StudentProfileInline(self.model, self.admin_site))
+        elif obj.role == "I":
+            inline_instances.append(InstituteProfileInline(self.model, self.admin_site))
+
+        return inline_instances
+
     def response_add(self, request, obj, post_url_continue=None):
         """
         Override: Redirect to the change list after creating a user,
@@ -69,17 +110,40 @@ class CustomUserAdmin(UserAdmin):
 
 @admin.register(Institute)
 class InstituteAdmin(admin.ModelAdmin):
-    list_display = [
-        'user_id',
-        'institute_name',
-        'description',
-        'website',
-    ]
+    list_display = ['id', 'user', 'institute_name', 'website']
+    list_select_related = ['user']
+
+    sortable_by = []
+    ordering = ['id']
+    list_per_page = 20
+
+    # Disable bulk actions
+    actions = None
+
+    def has_change_permission(self, request, obj=None):
+        """Make the view read-only."""
+        return False
+
+    def has_add_permission(self, request):
+        """Prevent creating profile outside of the User flow."""
+        return False
 
 @admin.register(Student)
 class StudentAdmin(admin.ModelAdmin):
-    list_display = [
-        'user_id',
-        'birth_date',
-        'bio'
-    ]
+    list_display = ['id', 'user', 'birth_date', 'bio']
+    list_select_related = ['user']
+    list_filter = ['birth_date']
+    sortable_by = []
+    ordering = ['id']
+    list_per_page = 20
+
+    # Disable bulk actions
+    actions = None
+
+    def has_change_permission(self, request, obj=None):
+        """Make the view read-only."""
+        return False
+
+    def has_add_permission(self, request):
+        """Prevent creating profile outside of the User flow."""
+        return False
