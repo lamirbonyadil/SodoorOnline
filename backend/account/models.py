@@ -56,11 +56,12 @@ class CustomUser(AbstractUser):
     city            = models.CharField(max_length=100, blank=True)
     address         = models.TextField(blank=True)
     role            = models.CharField(max_length=1, choices=Roles.choices, blank=True, help_text="Leave blank for superusers.")
+    is_active       = models.BooleanField(default=False)
 
     objects = CustomUserManager()
 
     USERNAME_FIELD  = 'username'
-    REQUIRED_FIELDS = ['email', 'first_name', 'last_name', 'phone_number']
+    REQUIRED_FIELDS = ['email', 'first_name', 'last_name', 'phone_number', 'role']
 
     def __str__(self):
         return self.username
@@ -68,9 +69,9 @@ class CustomUser(AbstractUser):
 
 class Institute(models.Model):
     user            = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
-    institute_name  = models.CharField(max_length=100)
+    institute_name  = models.CharField(max_length=100, blank=True)
     description     = models.TextField(blank=True)
-    website         = models.URLField(null=True, unique=True)
+    website         = models.URLField(null=True, blank=True, unique=True)
     logo            = models.ImageField(upload_to=get_image_file_path, default=default_file_path, blank=True, validators=[image_file_extension_validator])
     created_at      = models.DateTimeField(auto_now_add=True)
     updated_at      = models.DateTimeField(auto_now=True)
@@ -87,7 +88,7 @@ class Institute(models.Model):
 
 class Student(models.Model):
     user            = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
-    birth_date      = models.DateField(null=True, help_text="The date must be in the YYYY-MM-DD format.")
+    birth_date      = models.DateField(null=True, blank=True, help_text="The date must be in the YYYY-MM-DD format.")
     bio             = models.TextField(blank=True)
     avatar          = models.ImageField(upload_to=get_image_file_path, default=default_file_path, blank=True, validators=[image_file_extension_validator])
     created_at      = models.DateTimeField(auto_now_add=True)

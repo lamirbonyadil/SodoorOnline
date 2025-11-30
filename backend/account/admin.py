@@ -31,7 +31,7 @@ class CustomUserAdmin(UserAdmin):
     add_form = CustomUserCreationForm
     model = CustomUser
 
-    list_display = ['id', 'username', 'first_name', 'last_name', 'email', 'role', 'phone_number', 'province', 'city']
+    list_display = ['id', 'username', 'first_name', 'last_name', 'email', 'role', 'phone_number', 'province', 'city', 'is_active', 'is_staff', 'is_superuser']
     list_filter = ['role', 'province', 'city']
     search_fields = ['username', 'first_name', 'last_name']
 
@@ -107,6 +107,28 @@ class CustomUserAdmin(UserAdmin):
             return super().response_add(request, obj, post_url_continue)
 
         return HttpResponseRedirect(reverse('admin:account_customuser_changelist'))
+
+    def get_readonly_fields(self, request, obj=None):
+        """
+        Override: Configure read-only fields based on the view type.
+        'username' and 'role' are immutable once created and cannot be changed.
+        """
+        if not obj:
+            return []
+
+        return ['username', 'role']
+
+    def save_model(self, request, obj, form, change):
+        """
+            Override: to handle profile creation conflict between Admin and Signals.
+
+            Sets a temporary 'skip_signal' flag on the object to prevent the post_save
+            signal from running. This avoids an IntegrityError caused by the signal
+            and Admin inlines trying to create the same profile simultaneously.
+            """
+        obj.skip_signal = True
+        
+        super().save_model(request, obj, form, change)
 
 @admin.register(Institute)
 class InstituteAdmin(admin.ModelAdmin):
