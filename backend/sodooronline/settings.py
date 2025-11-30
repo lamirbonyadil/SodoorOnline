@@ -43,6 +43,9 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'account.apps.AccountConfig',
+    'rest_framework',
+    'rest_framework.authtoken',
+    'djoser',
 ]
 
 MIDDLEWARE = [
@@ -135,3 +138,37 @@ MEDIA_ROOT = BASE_DIR / 'media'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 APPEND_SLASH = True
+
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_EMAIL')
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.TokenAuthentication',
+    ]
+}
+
+DJOSER = {
+    'PASSWORD_RESET_CONFIRM_URL': '#/password/reset/confirm/{uid}/{token}',
+    'ACTIVATION_URL': '#/activate/{uid}/{token}',
+    'EMAIL_FRONTEND_PROTOCOL': os.getenv('DJOSER_PROTOCOL'),
+    'EMAIL_FRONTEND_DOMAIN': os.getenv('DJOSER_DOMAIN'),
+    'EMAIL_FRONTEND_SITE_NAME': os.getenv('DJOSER_SITE_NAME'),
+    'USER_CREATE_PASSWORD_RETYPE': True,
+    'LOGOUT_ON_PASSWORD_CHANGE': True,
+    'SEND_ACTIVATION_EMAIL': True,
+    'SEND_CONFIRMATION_EMAIL': False,
+    'PASSWORD_CHANGED_EMAIL_CONFIRMATION': False,
+    'PASSWORD_RESET_CONFIRM_RETYPE': True,
+    'SERIALIZERS': {
+        'user_create_password_retype': 'account.serializers.CustomUserCreatePasswordRetypeSerializer',
+        'user': 'account.serializers.CustomUserSerializer',
+        'current_user': 'account.serializers.CustomUserSerializer',
+    },
+    'PERMISSIONS': {
+        'set_password': ['account.permissions.DenyAll'],
+        'username_reset': ['account.permissions.DenyAll'],
+        'username_reset_confirm': ['account.permissions.DenyAll'],
+        'set_username': ['account.permissions.DenyAll']
+    }
+}
